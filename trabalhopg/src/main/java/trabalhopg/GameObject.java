@@ -1,124 +1,76 @@
 package trabalhopg;
 
-import org.lwjgl.opengl.*;
 import static org.lwjgl.opengl.GL11.*;
 
+import trabalhopg.io.Input;
+import trabalhopg.render.Model;
+import trabalhopg.render.Texture;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class GameObject {
-	private String objectName;
-    private float[] vertices;
-	private float positionX, positionY;
-	private float speedPositionX, speedPositionY;
-	
-	public GameObject( String objectName, float[] vertices, float positionX, float positionY ) {
-		this.objectName = objectName;
-		this.vertices = vertices;
-		this.positionX = positionX;
-		this.positionY = positionY;
-	}
-	
-	public GameObject() {}
+    private Model model;
+    private Texture texture;
+    private float x, y;
+    private float width, height;
 
-	public void render() {
-		glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-		glBegin(GL_QUADS);
-		for (int i = 0; i < vertices.length; i += 2) {
-			GL11.glVertex2f(vertices[i] + positionX, vertices[i + 1] + positionY);
-    	}
-        glEnd();
+    public GameObject(Model model, Texture texture, float x, float y, float width, float height) {
+        this.model = model;
+        this.texture = texture;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
     }
-	
-	public void move() {
-		positionX += speedPositionX;
-		positionY += speedPositionY;
-	}
-	
-	public boolean checkCollision( GameObject otherObject ) {
-		float thisLeft = this.positionX;
-	    float thisRight = this.positionX + this.getWidth();
-	    float thisTop = this.positionY + this.getHeight();
-	    float thisBottom = this.positionY;
 
-	    float otherLeft = otherObject.getPositionX();
-	    float otherRight = otherObject.getPositionX() + otherObject.getWidth();
-	    float otherTop = otherObject.getPositionY() + otherObject.getHeight();
-	    float otherBottom = otherObject.getPositionY();
+    public void update(Input input) {
+        if (input.isKeyDown(GLFW_KEY_W) && y + height / 2 < 1) {
+            y += 0.1f;
+        }
+        if (input.isKeyDown(GLFW_KEY_S) && y - height / 2 > -1) {
+            y -= 0.1f;
+        }
 
-	    if (thisRight >= otherLeft && thisLeft <= otherRight &&
-	        thisTop >= otherBottom && thisBottom <= otherTop) {
-	        return true; 
-	    }
+    }
 
-	    return false;
-	}
-	
-	public float getWidth() {
-	    float minX = Float.MAX_VALUE;
-	    float maxX = Float.MIN_VALUE;
-	    for (int i = 0; i < vertices.length; i += 2) {
-	        float x = vertices[i] + positionX;
-	        if (x < minX) minX = x;
-	        if (x > maxX) maxX = x;
-	    }
-	    return maxX - minX;
-	}
+    public void move(float dx, float dy) {
+        x += dx;
+        y += dy;
+    }
+    
+    public void moveAutomatically(float dx) {
+    	x += dx;
+    }
 
-	public float getHeight() {
-	    float minY = Float.MAX_VALUE;
-	    float maxY = Float.MIN_VALUE;
-	    for (int i = 1; i < vertices.length; i += 2) {
-	        float y = vertices[i] + positionY;
-	        if (y < minY) minY = y;
-	        if (y > maxY) maxY = y;
-	    }
-	    return maxY - minY;
-	}
-	
-	public String getObjectName() {
-		return objectName;
-	}
+    public void render() {
+        texture.bind();
+        glPushMatrix();
+        glTranslatef(x, y, 0);
+        model.render();
+        glPopMatrix();
+    }
 
-	public void setObjectName(String objectName) {
-		this.objectName = objectName;
-	}
+    public float getX() {
+        return x;
+    }
 
-	public float[] getVertices() {
-		return vertices;
-	}
+    public void setX(float x) {
+        this.x = x;
+    }
 
-	public void setVertices(float[] vertices) {
-		this.vertices = vertices;
-	}
+    public float getY() {
+        return y;
+    }
 
-	public float getPositionX() {
-		return positionX;
-	}
+    public void setY(float y) {
+        this.y = y;
+    }
 
-	public void setPositionX(float positionX) {
-		this.positionX = positionX;
-	}
+    public float getWidth() {
+        return width;
+    }
 
-	public float getPositionY() {
-		return positionY;
-	}
-
-	public void setPositionY(float positionY) {
-		this.positionY = positionY;
-	}
-
-	public float getSpeedPositionX() {
-		return speedPositionX;
-	}
-
-	public void setSpeedPositionX(float speedPositionX) {
-		this.speedPositionX = speedPositionX;
-	}
-
-	public float getSpeedPositionY() {
-		return speedPositionY;
-	}
-
-	public void setSpeedPositionY(float speedPositionY) {
-		this.speedPositionY = speedPositionY;
-	}
+    public float getHeight() {
+        return height;
+    }
 }
